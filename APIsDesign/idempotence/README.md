@@ -1,18 +1,18 @@
 # 幂等性
 
-## Implement
+## 实现  
 * 悲观锁（for update）
 * 乐观锁
 * 唯一约束
-```md
-最优排序：乐观锁 > 唯一约束 > 悲观锁
-```
+
+最优排序：乐观锁 > 唯一约束 > 悲观锁  
 
 ## 实例
-```md
-支付宝充值功能，如果支付宝同时通知多次，怎么保证幂等性？
-```
-* 悲观锁
+
+支付宝充值功能，如果支付宝同时通知多次，怎么保证幂等性？  
+
+* 悲观锁  
+  
 ```sql
 select * from t_order where order_id = trade_no for update;
 ```
@@ -51,6 +51,3 @@ try{
  //回滚本地事务;
 }
 ```
-
-## Reference
-* [考虑没有分布式锁定与Ben Darfler的幂等性策略](https://www.bennadel.com/blog/3390-considering-strategies-for-idempotency-without-distributed-locking-with-ben-darfler.htm)

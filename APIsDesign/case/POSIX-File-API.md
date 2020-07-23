@@ -1,6 +1,7 @@
-# POSIX File API
+# POSIX File API  
+
 ## 设计原则
-```md
+
 1. 提供清晰的思维模型 provides a good mental model
     一个API如何被使用，以及API本身如何被维护，是依赖于维护者和使用者能够对该API有清晰的、一致的认识。
 2. 简单 “Make things as simple as possible, but no simpler.” 
@@ -9,11 +10,11 @@
     然而相比于松耦合原则，这个原则更加有可操作性：如果一个API自身可以有多个__完全不同的实现__，
     一般来说这个API已经有了足够好的抽象，和自身的某一个具体实现无关，
     那么一般也不会出现和外部系统耦合过紧的问题。因此这个原则更本质一些。
-```
 
 ## 最佳实践
+
 ### 想想优秀的API例子：POSIX File API
-```md
+
 整个最佳实践可以总结为一句话：“想想File API是怎么设计的。”
 1. File API已经有几十年历史（从1988年算起将近40年），尽管期间硬件软件系统的发展经历了好几代，
     这套API核心保持了稳定。这是极其了不起的。
@@ -23,17 +24,18 @@
     例如磁盘、块设备、管道（pipe）、共享内存、网络、终端terminal等等。
     所有不同的设备不同的文件系统实现都可以采用了同样的接口，
     使得上层系统不必关注底层实现的不同，这是这套API强大的生命力的表现。
-```
-### Document well 写详细的文档
+
+### Document well 写详细的文档  
+
 ### Carefully define the "resource" of your API 仔细的定义“资源”
-```md
+
 Resource资源本身是对一套API操作核心对象的一个抽象Abstraction。
 例如对于文件的API，可以看出，文件File这个Resource（资源）的抽象，是“可以由一个字符串唯一标识的数据记录”。
 这个定义去除了文件是如何标识的（这个问题留给了各个文件系统的具体实现），
 也去除了关于如何存储的组织结构（again，留给了存储系统）细节。
-```
+
 ### Choose the right level of abstraction 选择合适的抽象层
-```md
+
 是在定义对象时需要选择合适的Level of abstraction（抽象的层级）
 
 以File API为例。在设计这样的API时，选择抽象的层级的可能的选项有多个，例如：
@@ -49,9 +51,9 @@ Resource资源本身是对一套API操作核心对象的一个抽象Abstraction�
 又例如，数据库相关的API定义，底层的抽象可能针对的是数据的存储结构，
 中间是数据库逻辑层需要定义数据交互的各种对象和协议，
 而在展示（View layer）的时候需要的抽象又有不同
-```
+
 ### Prefer using different model for different layers 不同层建议采用不同的数据模型
-```md
+
 强调强调的是不同层之间模型不同。
 
 在服务化的架构下，数据对象在处理的过程中往往经历多层。
@@ -68,9 +70,9 @@ John Ousterhout 书里面则更直接强调：Different layer, different abstrac
 不同的层采用同样的数据结构带来的问题还在于API的演进和维护过程。
 一个系统演进过程中可能需要替换掉后端的存储，可能因为性能优化的关系需要分离缓存等需求，
 这时会发现将两个层的数据绑定一起（甚至有时候直接把前端的json存储在后端），会带来不必要的耦合而阻碍演进。
-```
+
 ### Naming and identification of the resource 命名与标识
-```md
+
 API定义了一个资源对象，下面一般需要的是提供命名/标识(Naming and identification)。
 在naming/ID方面，一般有两个选择（不是指系统内部的ID，而是会暴露给用户的）：
 用free-form string作为ID（string nameAsId)
@@ -107,9 +109,9 @@ API定义了一个资源对象，下面一般需要的是提供命名/标识(Nam
 64位整数范围够用吗？
 数字ID可能不是那么用户友好，对于用户来讲数字的ID会有帮助吗？
 如果这些问题都有答案而且不是什么阻碍，那么使用数字ID是可以的，__否则要慎用数字ID__。
-```
+
 ### Conceptually what are the meaningful operations on this resource? 对于该对象来说，什么操作概念上是合理的？
-```md
+
 在确定下来了资源/对象以后，我们还需要定义哪些操作需要支持。这时，考虑的重点是“__概念上合理(Conceptually reasonable)__”。
 换句话说，operation + resource 连在一起听起来自然而然合理
 （如果Resource本身命名也比较准确的话。当然这个“如果命名准确”是个big if，非常不容易做到）。
@@ -119,9 +121,9 @@ API定义了一个资源对象，下面一般需要的是提供命名/标识(Nam
 Update quota（更新额度），transfer quota（原子化的转移额度）
 但是如果试图Create Quota，听上去就不那么自然，因额度这样一个概念似乎表达了一个数量，概念上不需要创建。
 额外需要思考一下，这个对象是否真的需要创建？我们真正需要做的是什么？
-```
+
 ### For update operations, prefer idempotency whenever feasible 更新操作，尽量保持幂等性
-```md
+
 Idempotency幂等性，指的是一种操作具备的性质，具有这种性质的操作可以被多次实施并且不会影响到初次实施的结果
 “the property of certain operations in mathematics and computer science whereby they 
 can be applied multiple times without changing the result beyond the initial application.”
@@ -149,9 +151,9 @@ can be applied multiple times without changing the result beyond the initial app
     Delete的幂等性问题，往往在于一个对象被删除后，再次试图删除可能会由于数据无法被发现导致出错。
     这个行为一般来说也没什么问题，虽然严格意义上不幂等，但是也无副作用。
     如果需要实现Idempotency，系统也采用了Archive->Purge生命周期的方式分步删除，或者持久化Purge log的方式，都能支持幂等删除的实现。
-```
+
 ### Compatibility 兼容
-```md
+
 API的变更需要兼容，兼容，兼容！重要的事情说三遍。
 这里的兼容指的是向后兼容，而兼容的定义是不会Break客户端的使用，
 也即__老的客户端能否正常访问服务端的新版本（如果是同一个大版本下）不会有错误的行为__。
@@ -161,9 +163,9 @@ API的变更需要兼容，兼容，兼容！重要的事情说三遍。
 删除一个方法、字段或者enum的数值
 方法、字段改名
 方法名称字段不改，但是语义和行为的变化，也是不兼容的。这类比较容易被忽视。
-```
+
 ### Batch mutations 批量更新
-```md
+
 批量更新如何设计是另一个常见的API设计决策。这里我们常见有两种模式：
 客户端批量更新，或者服务端实现批量更新。
 
@@ -175,9 +177,9 @@ __除非对于客户来说提供原子化+事务性的批量很有意义（all-o
 批量更新往往给服务端性能带来很大挑战，也容易被客户端滥用接口
 在客户端实现批量，可以更好的将负载由不同的服务端来承担（见图）
 客户端批量可以更灵活的由客户端决定失败重试策略
-```
+
 ### Be aware of the risks in full replace 警惕全体替换更新模式的风险
-```md
+
 所谓Full replacement更新，是指在Mutation API中，用一个全新的Object/Resource去替换老的Object/Resource的模式。
 API写出来大概是这样的: UpdateFoo(Foo newFoo);
 这是非常常见的Mutation设计模式。但是这样的模式有一些潜在的风险作为API设计者必须了解。
@@ -196,26 +198,21 @@ UpdateFoo {
 
 不过由于这样的API方式维护和代码实现都复杂一些，采用这样模式的API并不多。
 所以，本节的标题是“be aware of the risk“，而不是要求一定要用update mask。
-```
+
 ### Don't create your own error codes or error mechanism 不要试图创建自己的错误码和返回错误机制
-```md
+
 API的设计者有时很想创建自己的Error code，或者是表达返回错误的不同机制，
 因为每个API都有很多的细节的信息，设计者想表达出来并返回给用户，想着“用户可能会用到”。
 但是事实上，这么做经常只会使API变得更复杂更难用。
 
 Error-handling是用户使用API非常重要的部分。为了让用户更容易的使用API，
 最佳的实践应该是用标准、统一的Error Code，而不是每个API自己去创立一套。
-例如HTTP有规范的error code，Google Could API设计时都采用统一的Error code等【2】。
-```
+例如HTTP有规范的error code，Google Could API设计时都采用统一的Error code等【2】。  
+
 * 为什么不建议自己创建Error code机制？
-```md
+
 1. Error-handling是客户端的事，而对于客户端来说，是很难关注到那么多错误的细节的，一般来说最多分两三种情况处理。
     往往客户端最关心的是"这个error是否应该重试(retryable)"还是应该继续向上层返回错误，而不是试图区分不同的error细节。
     这时多样的错误代码机制只会让处理变得复杂
 2. 有人觉得提供更多的自定义的error code有助于传递信息，但是这些信息除非有系统分别处理才有意义。
-    如果只是传递信息的话，error message里面的字段可以达到同样的效果。
-```
-## Reference
-* 1. [阿里研究员谷朴：API 设计最佳实践的思考](https://yq.aliyun.com/articles/683044)
-* 2. [API Design patterns for Google Cloud](https://cloud.google.com/apis/design/design_patterns)
-* [API design best practices](https://docs.microsoft.com/en-us/azure/architecture/best-practices/api-design?spm=a2c4e.11153940.blogcont683044.11.391b7163skKKNU)
+    如果只是传递信息的话，error message里面的字段可以达到同样的效果。  
