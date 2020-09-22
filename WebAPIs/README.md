@@ -4,10 +4,12 @@
 * [GraphQL API](GraphQL/README.md)
 
 ## Design
+
 * [The Web API Checklist -- 43 Things To Think About When Designing, Testing, and Releasing your API](https://mathieu.fenniak.net/the-api-checklist/)
 
 ## RPC vs REST vs GraphQL
-```md
+
+```
 在下列情况考虑 RPC 风格的 API：
 偏向内部的API
 没有太多的时间考虑API的设计或没有架构师
@@ -26,4 +28,5 @@
 ```
 
 ## References
-* [How I measure Response Times of Web APIs using curl](https://www.tuicool.com/articles/ymyqUrr)
+
+* [](https://www.tuicool.com/articles/ymyqUrr)
